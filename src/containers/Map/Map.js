@@ -15,6 +15,9 @@ import { compose, withProps, lifecycle } from "recompose";
 import { withScriptjs, withGoogleMap, GoogleMap, Marker, DirectionsRenderer} from "react-google-maps";
 import navigationItems from "../../components/Navigation/NavigationItems/NavigationItems";
 
+const refs = {};
+const _ = require("lodash");
+
 
 class MapContainer extends Component {
     state = {
@@ -25,7 +28,9 @@ class MapContainer extends Component {
         showSearchResult: null,
         directions: null,
         watchId: null,
-        zoomLevel: 15
+        zoomLevel: 15,
+        bounds: null,
+        markers: []
     };
 
     markerClickHandler = (id) =>{
@@ -115,10 +120,10 @@ class MapContainer extends Component {
         }
     }
     onCenterChangedHandler = () => {
-        this.setState({isChanged: true})
+        this.setState({mapCenterLoc: refs.map.getCenter()})
     };
     onRecenterHandler = () => {
-        this.setState({isChanged: false})
+        this.setState({mapCenterLoc:  this.state.currentLocation })
     };
 
     onGoToClosestSlotHandler = () =>{
@@ -144,6 +149,44 @@ class MapContainer extends Component {
     onCancelDirectionHandler = ()=>{
       this.setState({directions: null})
     };
+
+    onMapMountedHandler = (ref) => {
+        refs.map = ref;
+    };
+    onSearchBoxMounted =  (ref) => {
+        console.log('Search box', ref);
+        refs.searchBox = ref;
+    };
+    onBoundsChanged =  () => {
+        this.setState({
+            bounds: refs.map.getBounds(),
+            mapCenterLoc: refs.map.getCenter(),
+        })
+    };
+    onPlacesChanged =  () => {
+        const places = refs.searchBox.getPlaces();
+        const bounds = new google.maps.LatLngBounds();
+
+        places.forEach(place => {
+            if (place.geometry.viewport) {
+            bounds.union(place.geometry.viewport)
+            } else {
+                bounds.extend(place.geometry.location)
+            }
+             });
+        const nextMarkers = places.map(place => ({
+            position: place.geometry.location,
+        }));
+
+        const nextCenter = _.get(nextMarkers, '0.position', this.state.mapCenterLoc);
+
+        this.setState({
+            mapCenterLoc: nextCenter,
+            markers: nextMarkers,
+        });
+
+    };
+
     getUserCurrentLocation = () => {
             return new Promise ( (resolve, reject) => {
                 if (navigator.geolocation) {
@@ -164,7 +207,6 @@ class MapContainer extends Component {
             .then(res =>
                 this.setState({currentLocation: res, mapCenterLoc: res})
             )
-
     }
 
 
@@ -193,7 +235,13 @@ class MapContainer extends Component {
                         onCenterChanged={this.onCenterChangedHandler}
                         onGoToClosestSlot={this.onGoToClosestSlotHandler}
                         onCancelDirection={this.onCancelDirectionHandler}
-                        onReCentered={this.onRecenterHandler}
+                        onRecentered={this.onRecenterHandler}
+                        onMapMounted={this.onMapMountedHandler}
+                        onSearchBoxMounted={this.onSearchBoxMounted}
+                        onPlacesChanged={this.onPlacesChanged}
+                        onBounceChanged={this.onBoundsChanged}
+                        markers={this.state.markers}
+                        bounds={this.state.bounds}
                     /> : null }
 
                 <Modal

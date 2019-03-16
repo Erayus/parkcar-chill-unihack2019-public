@@ -5,6 +5,8 @@ import { withScriptjs, withGoogleMap, GoogleMap, Marker, DirectionsRenderer} fro
 import UserIcon from "../../assests/Map-Icon/Button icon/Driver-icon.jpg";
 /*global google*/
 import classes from './MapComponent.module.css'
+const { SearchBox } = require("react-google-maps/lib/components/places/SearchBox");
+
 
 const MyMapComponent = compose(
     withProps({
@@ -16,16 +18,18 @@ const MyMapComponent = compose(
     withScriptjs,
     withGoogleMap
 )((props) => {
-
-    console.log('Direction: ', props.directions);
+    if (props.markers[0]){
+        console.log('Markers: ', new google.maps.LatLng(props.markers[0].position.lat()));
+    }
         let handleMarkerClick = (id) => {
             props.onSlotSelected(id)
         };
 
         return (
             <GoogleMap
+                ref={props.onMapMounted}
                 zoom={+props.zoomLevel}
-                defaultCenter={{lat: props.userCurrentLoc.lat, lng: props.userCurrentLoc.lng}}
+                center={props.mapCenterLoc}
                 defaultOptions={{
                     zoomControl: false,
                     fullscreenControl: false,
@@ -66,7 +70,8 @@ const MyMapComponent = compose(
                     })
                     : null
                 }
-                {props.directions ? (
+                {props.directions ?
+                    (
                     <div>
                         <DirectionsRenderer options={{suppressMarkers: true, preserveViewport: true}} directions={props.directions} />
                         <button className={classes.CancelDirectionBtn} onClick={props.onCancelDirection}>
@@ -77,12 +82,44 @@ const MyMapComponent = compose(
                             {props.directions.routes[0].legs[0].duration.text}
                         </div>
                     </div>
-                    ) : null
+                    )
+                    : null
                 }
 
+                <SearchBox
+                    ref={props.onSearchBoxMounted}
+                    bounds={props.bounds}
+                    controlPosition={google.maps.ControlPosition.TOP_LEFT}
+                    onPlacesChanged={props.onPlacesChanged}
+                >
+                    <input
+                        type="text"
+                        placeholder="Customized your placeholder"
+                        style={{
+                            boxSizing: `border-box`,
+                            border: `1px solid transparent`,
+                            width: `240px`,
+                            height: `32px`,
+                            marginTop: `87px`,
+                            padding: `0 12px`,
+                            borderRadius: `3px`,
+                            boxShadow: `0 2px 6px rgba(0, 0, 0, 0.3)`,
+                            fontSize: `14px`,
+                            outline: `none`,
+                            textOverflow: `ellipses`,
+                        }}
+                    />
+                </SearchBox>
+                {props.markers.map((marker, index) =>
+                    <Marker key={index} position={marker.position} />
+                )}
 
                 <button className={classes.ClosestButton} onClick={props.onGoToClosestSlot} >
                     <i className="fas fa-shipping-fast"></i>
+                </button>
+
+                <button className={classes.RecenterButton} onClick={props.onRecentered} >
+                    <i className="fas fa-map-marker-alt"></i>
                 </button>
             </GoogleMap>
         );

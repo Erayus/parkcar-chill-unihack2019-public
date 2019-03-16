@@ -1,15 +1,16 @@
 .ClosestButton{
-    width: 50px;
+    width: 60px;
     position: fixed;
-    height: 50px;
+    height: 60px;
     font-size: 25px;
     border-radius: 100%;
     bottom: 20px;
     border: 0 white;
     right: 15px;
-    background-color: white;
-    color: blue;
+    background-color: #FA39A7;
+    color: white;
     box-shadow: 0px 0.5px 4px 0.5px grey;
+    z-index: 100;
 }
 
 .ClosestButton:focus{
@@ -17,18 +18,19 @@
 }
 .ClosestButton:hover,
 .ClosestButton:active{
-    background-color: blue;
-    color: white;
+    background-color: white;
+    color: #FA39A7;
 }
 .CancelDirectionBtn{
-    width: 50px;
+    width: 60px;
     position: fixed;
-    height: 50px;
+    height: 60px;
     font-size: 25px;
     border-radius: 100%;
     bottom: 20px;
     border: 0 white;
-    right: 45%;
+    z-index: 101;
+    right: 15px;
     background-color: #ff4444;
     color: white;
     box-shadow: 0px 0.5px 4px 0.5px grey;
@@ -42,7 +44,26 @@
     top: 70px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: white;
-    opacity: 0.7;
+    background-color: #FA39A7;
+    opacity: 0.8;
+    color: white;
+    transition: all 0.3s ease-out;
 }
 
+.RecenterButton{
+    width: 60px;
+    position: fixed;
+    height: 60px;
+    font-size: 25px;
+    border-radius: 100%;
+    bottom: 100px;
+    border: 0 white;
+    z-index: 101;
+    right: 15px;
+    background-color: blue;
+    color: white;
+    box-shadow: 0px 0.5px 4px 0.5px grey;
+}
+.RecenterButton:focus{
+    outline: none;
+}
