@@ -11,7 +11,7 @@ const toolbar = (props) => {
                 <i className="fas fa-bars"></i>
             </button>
             <div className={classes.Logo}>
-                <img src={Logo} height='50px'/>
+                <span><strong>ParkCar Chill</strong></span>
             </div>
         </header>
     )

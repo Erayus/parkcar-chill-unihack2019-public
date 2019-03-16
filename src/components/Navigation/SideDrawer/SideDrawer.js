@@ -9,10 +9,13 @@ const sideDrawer = (props) => {
     return (
         <React.Fragment>
             <div className={[classes.SideDrawer, props.show ? classes.Open : classes.Close].join(' ')}>
-                <div className={classes.Logo}>
-                    <img src={LogoURL} height="50px"/>
+                <div className={classes.Cover}>
+                    <div className={classes.Logo}>
+                        <img src={LogoURL} height="150px"/>
+                    </div>
                 </div>
-                <nav>
+
+                <nav className={classes.Nav}>
                     <NavigationItems/>
                 </nav>
             </div>

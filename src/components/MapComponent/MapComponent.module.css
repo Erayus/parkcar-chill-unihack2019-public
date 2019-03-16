@@ -1,0 +1,48 @@
+.ClosestButton{
+    width: 50px;
+    position: fixed;
+    height: 50px;
+    font-size: 25px;
+    border-radius: 100%;
+    bottom: 20px;
+    border: 0 white;
+    right: 15px;
+    background-color: white;
+    color: blue;
+    box-shadow: 0px 0.5px 4px 0.5px grey;
+}
+
+.ClosestButton:focus{
+    outline:none
+}
+.ClosestButton:hover,
+.ClosestButton:active{
+    background-color: blue;
+    color: white;
+}
+.CancelDirectionBtn{
+    width: 50px;
+    position: fixed;
+    height: 50px;
+    font-size: 25px;
+    border-radius: 100%;
+    bottom: 20px;
+    border: 0 white;
+    right: 45%;
+    background-color: #ff4444;
+    color: white;
+    box-shadow: 0px 0.5px 4px 0.5px grey;
+}
+
+.DirectionDetails{
+    position: fixed;
+    box-shadow: 0px 0.5px 4px 0.5px grey;
+    border-radius: 8px;
+    padding: 10px;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    opacity: 0.7;
+}
+

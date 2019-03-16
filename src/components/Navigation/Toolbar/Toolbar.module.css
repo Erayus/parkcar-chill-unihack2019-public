@@ -22,9 +22,17 @@
 .Toggle-Btn{
     position: fixed;
     left: 20px;
+    color: white;
+    background-color: #FA39A7;
+    border: none;
+    width: 40px;
+    height: 40px;
 }
 .Logo{
     height: 80%;
+    color: #FA39A7;
+    font-size: 35px;
+    font-family: 'Sniglet', cursive;
 }
 
 @media (max-width: 499px) {

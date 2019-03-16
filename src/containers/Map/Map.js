@@ -8,19 +8,24 @@ import slotIcon9P from "../../assests/Map-Icon/Unoccupied/Free9p.png";
 /*global google*/
 import axios from '../../axios';
 import Modal from "../../components/UI/Modal/Modal";
+import MapComponent from "../../components/MapComponent/MapComponent"
 import classes from './Map.module.css'
 
 import { compose, withProps, lifecycle } from "recompose";
 import { withScriptjs, withGoogleMap, GoogleMap, Marker, DirectionsRenderer} from "react-google-maps";
+import navigationItems from "../../components/Navigation/NavigationItems/NavigationItems";
 
 
 class MapContainer extends Component {
     state = {
         currentLocation: null,
+        mapCenterLoc: null,
         parkingSlots: [],
         singleSlotDetail: null,
         showSearchResult: null,
-        directions: null
+        directions: null,
+        watchId: null,
+        zoomLevel: 15
     };
 
     markerClickHandler = (id) =>{
@@ -31,33 +36,70 @@ class MapContainer extends Component {
         this.setState({singleSlotDetail: selectedSlot})
     };
 
-    showDirection(selectedSlot){
-        let destination = {
+    showDirection = (selectedSlot) => {
+        const destination = {
             lat: selectedSlot.lat,
             lng: selectedSlot.lon
         };
-
         const DirectionsService = new google.maps.DirectionsService();
 
-        DirectionsService.route({
-            origin: new google.maps.LatLng(this.state.currentLocation.lat, this.state.currentLocation.lng),
-            destination: new google.maps.LatLng(destination.lat, destination.lng),
-            travelMode: google.maps.TravelMode.DRIVING,
-        }, (result, status) => {
-            if (status === google.maps.DirectionsStatus.OK) {
-                console.log(result);
-                this.onCloseSingleSlotDetail();
-                this.setState({
-                    directions: result,
-                });
+        //If watchId exists
+        if (this.state.watchId){
+            navigator.geolocation.clearWatch(this.state.watchId);
+        }
+
+        this.state.watchId = navigator.geolocation.watchPosition((position) => {
+
+            let currentUserLocation = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            };
+            if (this.distanceDifference(currentUserLocation, destination) < 0.01 ) {
+                alert('You have arrived!')
             } else {
-                console.error(`error fetching directions ${result}`);
+                DirectionsService.route({
+                    origin: new google.maps.LatLng(this.state.currentLocation.lat, this.state.currentLocation.lng),
+                    destination: new google.maps.LatLng(destination.lat, destination.lng),
+                    travelMode: google.maps.TravelMode.DRIVING,
+                }, (result, status) => {
+                    if (status === google.maps.DirectionsStatus.OK) {
+                        this.setState({
+                            directions: result,
+                            zoomLevel: 18
+                        });
+                        this.onCloseSingleSlotDetail();
+
+                    } else {
+                        console.error(`error fetching directions ${result}`);
+                    }
+                });
             }
         });
-    }
+    };
+
+
+
+    distanceDifference = (current, destination) =>  {
+        var earthRadiusKm = 6371;
+
+        let currentLat = this.degreesToRadians(current.lat);
+        let desLat = this.degreesToRadians(destination.lat);
+
+        let dLat = this.degreesToRadians(destination.lat- current.lat);
+        let dLon = this.degreesToRadians(destination.lng- current.lng);
+
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(currentLat) * Math.cos(desLat);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return earthRadiusKm * c;
+    };
+
+    degreesToRadians = (degrees) => {
+        return degrees * Math.PI / 180;
+    };
 
     onCloseSingleSlotDetail = () => {
-        this.setState({singleSlotDetail: null})
+        this.setState({singleSlotDetail: null});
     };
 
     generateIcon(type){
@@ -72,17 +114,57 @@ class MapContainer extends Component {
                 return slotIcon9P
         }
     }
+    onCenterChangedHandler = () => {
+        this.setState({isChanged: true})
+    };
+    onRecenterHandler = () => {
+        this.setState({isChanged: false})
+    };
 
+    onGoToClosestSlotHandler = () =>{
+        const sortedBasedOnDistance = this.state.parkingSlots.map(slot => {
+            let currentLocation = this.state.currentLocation;
+            let destination= {
+                lat: slot.lat,
+                lng: slot.lon
+            };
+            return {
+                ...slot,
+                distanceDif: this.distanceDifference(currentLocation, destination)
+            }
+        }).sort( (a,b) => {
+           return a.distanceDif - b.distanceDif
+        });
+        const closestSlot = sortedBasedOnDistance[0];
+
+        this.showDirection(closestSlot)
+
+    };
+
+    onCancelDirectionHandler = ()=>{
+      this.setState({directions: null})
+    };
+    getUserCurrentLocation = () => {
+            return new Promise ( (resolve, reject) => {
+                if (navigator.geolocation) {
+                    this.state.watchId = navigator.geolocation.watchPosition((position) => {
+                        let result = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        resolve(result)
+                    })
+                }else {
+                    reject('Sorry we need your location')
+                }
+            })
+    };
     componentWillMount() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((position)=>{
-                let currentLoc = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                };
-                this.setState({currentLocation: currentLoc})
-            });
-        }
+        this.getUserCurrentLocation()
+            .then(res =>
+                this.setState({currentLocation: res, mapCenterLoc: res})
+            )
+
     }
 
 
@@ -101,13 +183,18 @@ class MapContainer extends Component {
 
             <div>
                 { this.state.currentLocation ?
-                    <MyMapComponent
-                        currentLoc={this.state.currentLocation}
+                    <MapComponent
+                        userCurrentLoc={this.state.currentLocation}
+                        mapCenterLoc={this.state.mapCenterLoc}
+                        zoomLevel={this.state.zoomLevel}
                         parkingSlots={this.state.parkingSlots}
                         onSlotSelected={this.markerClickHandler}
                         directions={this.state.directions}
-                    />
-                        : null }
+                        onCenterChanged={this.onCenterChangedHandler}
+                        onGoToClosestSlot={this.onGoToClosestSlotHandler}
+                        onCancelDirection={this.onCancelDirectionHandler}
+                        onReCentered={this.onRecenterHandler}
+                    /> : null }
 
                 <Modal
                 show={this.state.singleSlotDetail}
@@ -124,67 +211,11 @@ class MapContainer extends Component {
         axios.get('/')
             .then(res => {
                 let filterData = res.data.slice(0,10);
-                console.log(filterData);
+                // console.log(filterData);
                 this.setState({parkingSlots: [...filterData]})
             })
     }
 
 }
-
-const MyMapComponent = compose(
-    withProps({
-        googleMapURL: "https://maps.googleapis.com/maps/api/js?key=AIzaSyBQHtyAJNwYpl47skW7ySxFtuF6VCGm51A&v=3.exp&libraries=geometry,drawing,places",
-        loadingElement: <div style={{ height: `100%` }} />,
-        containerElement: <div style={{ height: `100vh` }} />,
-        mapElement: <div style={{ height: `100%` }} />,
-    }),
-    withScriptjs,
-    withGoogleMap
-)((props) => {
-
-
-    let handleMarkerClick = (id) => {
-        props.onSlotSelected(id)
-    };
-
-        return (
-
-            <GoogleMap
-                defaultZoom={15}
-                defaultCenter={{lat: props.currentLoc.lat, lng: props.currentLoc.lng}}
-            >
-                <Marker position={{lat: props.currentLoc.lat, lng: props.currentLoc.lng}}/>
-
-                {/*Generate parking slot markers*/}
-                {props.parkingSlots.length > 0 ? props.parkingSlots.map(slot => {
-                        return (
-                            <Marker
-                                key={slot.st_marker_id}
-                                position={{
-                                    lat: +slot.lat,
-                                    lng: +slot.lon
-                                }}
-                                icon={{
-                                    url: slotIcon1P,
-                                    scaledSize: new google.maps.Size(30,30)
-                                }}
-                                data={{
-                                    id: slot.st_marker_id
-                                }}
-                                onClick={() => handleMarkerClick(slot.st_marker_id)}
-                                title={"Available parking slot"}
-                            />
-                        )
-                    })
-                    : null
-                }
-
-                {props.directions && <DirectionsRenderer options={{suppressMarkers: true}} directions={props.directions} />}
-            </GoogleMap>
-        );
-    }
-
-);
-
 
 export default MapContainer;
