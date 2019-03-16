@@ -1,0 +1,6 @@
+.Map{
+    height: 100%;
+}
+.Map > .gmnoprint{
+    display: none;
+}
