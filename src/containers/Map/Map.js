@@ -1,35 +1,62 @@
 import React, {Component} from 'react';
-import {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react';
-import classes from "./Map.module.css";
+// import {Map, InfoWindow, Marker, GoogleApiWrapper, DirectionService} from 'google-maps-react';
 import userIcon from "../../assests/Map-Icon/Button icon/driver icon.png";
-import slotIcon1P from "../../assests/Map-Icon/Unoccupied/Free 1P.png"
-import slotIcon2P from "../../assests/Map-Icon/Unoccupied/Free 2p.png"
-import slotIcon4P from "../../assests/Map-Icon/Unoccupied/4p Free.png"
-import slotIcon9P from "../../assests/Map-Icon/Unoccupied/Free9p.png"
+import slotIcon1P from "../../assests/Map-Icon/Unoccupied/Free 1P.png";
+import slotIcon2P from "../../assests/Map-Icon/Unoccupied/Free 2p.png";
+import slotIcon4P from "../../assests/Map-Icon/Unoccupied/4p Free.png";
+import slotIcon9P from "../../assests/Map-Icon/Unoccupied/Free9p.png";
 /*global google*/
-
 import axios from '../../axios';
 import Modal from "../../components/UI/Modal/Modal";
+import classes from './Map.module.css'
+
+import { compose, withProps, lifecycle } from "recompose";
+import { withScriptjs, withGoogleMap, GoogleMap, Marker, DirectionsRenderer} from "react-google-maps";
+
+
 class MapContainer extends Component {
     state = {
         currentLocation: null,
         parkingSlots: [],
         singleSlotDetail: null,
-        showSearchResult: null
+        showSearchResult: null,
+        directions: null
     };
 
-    markerClickHandler = (props, marker, e) =>{
-        console.log('Maker', marker);
-        let selectedSlot = {
-            type: '',
-            paid: false,
-            id: marker
-        };
+    markerClickHandler = (id) =>{
+        let selectedSlot = this.state.parkingSlots.filter((slot) => {
+           return slot.st_marker_id === id
+        })[0];
+
         this.setState({singleSlotDetail: selectedSlot})
     };
 
+    showDirection(selectedSlot){
+        let destination = {
+            lat: selectedSlot.lat,
+            lng: selectedSlot.lon
+        };
+
+        const DirectionsService = new google.maps.DirectionsService();
+
+        DirectionsService.route({
+            origin: new google.maps.LatLng(this.state.currentLocation.lat, this.state.currentLocation.lng),
+            destination: new google.maps.LatLng(destination.lat, destination.lng),
+            travelMode: google.maps.TravelMode.DRIVING,
+        }, (result, status) => {
+            if (status === google.maps.DirectionsStatus.OK) {
+                console.log(result);
+                this.onCloseSingleSlotDetail();
+                this.setState({
+                    directions: result,
+                });
+            } else {
+                console.error(`error fetching directions ${result}`);
+            }
+        });
+    }
+
     onCloseSingleSlotDetail = () => {
-        console.log('clicked');
         this.setState({singleSlotDetail: null})
     };
 
@@ -59,62 +86,40 @@ class MapContainer extends Component {
     }
 
 
-    render(){
-        let map = null;
-        if (this.state.currentLocation){
-            map = (
-                <Map google={this.props.google}
-                 zoom={14}
-                 initialCenter={{
-                     lat: this.state.currentLocation.lat,
-                     lng: this.state.currentLocation.lng
-                 }}
-                >
-                    <Marker
-                        title={"User"}
-                        icon={{
-                            url: userIcon,
-                            scaledSize: new google.maps.Size(50,50)
-                        }}
-                        name={'SOMA'}
-                    />
-                    {this.state.parkingSlots.length > 0 ? this.state.parkingSlots.map(slot => {
-                        return (
-                            <Marker
-                                key={slot.st_marker_id}
-                                position={{
-                                    lat: slot.lat,
-                                    lng: slot.lon
-                                }}
-                                icon={{
-                                    url: slotIcon1P,
-                                    scaledSize: new google.maps.Size(30,30)
-                                }}
-                                data={{
-                                    id: slot.st_marker_id
-                                }}
-                                onClick={this.markerClickHandler}
-                                title={"Available parking slot"}
-                            />
-                        )
-                    })
-                        : null
-                    }
-
-                </Map>
+    render() {
+        let slotDetail = null;
+        if (this.state.singleSlotDetail){
+            slotDetail = (
+                <div>
+                    <h1>{this.state.singleSlotDetail.st_marker_id}</h1>
+                    <button className="btn btn-success"
+                            onClick={() => this.showDirection(this.state.singleSlotDetail)}>Start</button>
+                </div>
             )
         }
         return (
+
             <div>
-                { this.state.currentLocation ? map : null }
+                { this.state.currentLocation ?
+                    <MyMapComponent
+                        currentLoc={this.state.currentLocation}
+                        parkingSlots={this.state.parkingSlots}
+                        onSlotSelected={this.markerClickHandler}
+                        directions={this.state.directions}
+                    />
+                        : null }
+
                 <Modal
-                    show={this.state.singleSlotDetail}
-                    modalClosed={this.onCloseSingleSlotDetail}
-                ></Modal>
+                show={this.state.singleSlotDetail}
+                modalClosed={this.onCloseSingleSlotDetail}
+                >
+                    {slotDetail}
+                </Modal>
             </div>
 
         )
     }
+
     componentDidMount() {
         axios.get('/')
             .then(res => {
@@ -126,6 +131,60 @@ class MapContainer extends Component {
 
 }
 
-export default GoogleApiWrapper({
-    apiKey: ("AIzaSyBQHtyAJNwYpl47skW7ySxFtuF6VCGm51A")
-})(MapContainer)
+const MyMapComponent = compose(
+    withProps({
+        googleMapURL: "https://maps.googleapis.com/maps/api/js?key=AIzaSyBQHtyAJNwYpl47skW7ySxFtuF6VCGm51A&v=3.exp&libraries=geometry,drawing,places",
+        loadingElement: <div style={{ height: `100%` }} />,
+        containerElement: <div style={{ height: `100vh` }} />,
+        mapElement: <div style={{ height: `100%` }} />,
+    }),
+    withScriptjs,
+    withGoogleMap
+)((props) => {
+
+
+    let handleMarkerClick = (id) => {
+        props.onSlotSelected(id)
+    };
+
+        return (
+
+            <GoogleMap
+                defaultZoom={15}
+                defaultCenter={{lat: props.currentLoc.lat, lng: props.currentLoc.lng}}
+            >
+                <Marker position={{lat: props.currentLoc.lat, lng: props.currentLoc.lng}}/>
+
+                {/*Generate parking slot markers*/}
+                {props.parkingSlots.length > 0 ? props.parkingSlots.map(slot => {
+                        return (
+                            <Marker
+                                key={slot.st_marker_id}
+                                position={{
+                                    lat: +slot.lat,
+                                    lng: +slot.lon
+                                }}
+                                icon={{
+                                    url: slotIcon1P,
+                                    scaledSize: new google.maps.Size(30,30)
+                                }}
+                                data={{
+                                    id: slot.st_marker_id
+                                }}
+                                onClick={() => handleMarkerClick(slot.st_marker_id)}
+                                title={"Available parking slot"}
+                            />
+                        )
+                    })
+                    : null
+                }
+
+                {props.directions && <DirectionsRenderer options={{suppressMarkers: true}} directions={props.directions} />}
+            </GoogleMap>
+        );
+    }
+
+);
+
+
+export default MapContainer;
