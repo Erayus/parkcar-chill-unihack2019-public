@@ -70,7 +70,8 @@ class MapContainer extends Component {
                     if (status === google.maps.DirectionsStatus.OK) {
                         this.setState({
                             directions: result,
-                            zoomLevel: 18
+                            zoomLevel: 18,
+                            mapCenterLoc: this.state.currentLocation
                         });
                         this.onCloseSingleSlotDetail();
 
@@ -165,6 +166,7 @@ class MapContainer extends Component {
     };
     onPlacesChanged =  () => {
         const places = refs.searchBox.getPlaces();
+
         const bounds = new google.maps.LatLngBounds();
 
         places.forEach(place => {
@@ -175,7 +177,7 @@ class MapContainer extends Component {
             }
              });
         const nextMarkers = places.map(place => ({
-            position: place.geometry.location,
+            position: place.geometry.location
         }));
 
         const nextCenter = _.get(nextMarkers, '0.position', this.state.mapCenterLoc);

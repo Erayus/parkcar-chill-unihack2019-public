@@ -67,3 +67,23 @@
 .RecenterButton:focus{
     outline: none;
 }
+
+.SearchBox{
+    box-sizing: border-box;
+    border: 1px solid #FA39A7;
+    width: 240px;
+    height: 42px;
+    margin: 70px 80px 0;
+    padding: 0 20px;
+    border-radius: 3px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    fon-size: 16px;
+    outline: none;
+    text-overflow: 'ellipses';
+    opacity: 0.7;
+    transition: opacity ease 0.5s ;
+}
+
+.SearchBox:focus{
+    opacity: 1;
+}

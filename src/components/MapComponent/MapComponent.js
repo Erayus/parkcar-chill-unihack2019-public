@@ -18,8 +18,9 @@ const MyMapComponent = compose(
     withScriptjs,
     withGoogleMap
 )((props) => {
+
     if (props.markers[0]){
-        console.log('Markers: ', new google.maps.LatLng(props.markers[0].position.lat()));
+        console.log('Markers:fdaad ', props.markers[0]);
     }
         let handleMarkerClick = (id) => {
             props.onSlotSelected(id)
@@ -37,7 +38,6 @@ const MyMapComponent = compose(
                     mapTypeControl: false
                 }}
                 onCenterChanged={props.onCenterChanged}
-
             >
                 <Marker
                     position={{lat: props.userCurrentLoc.lat, lng: props.userCurrentLoc.lng}}
@@ -46,7 +46,6 @@ const MyMapComponent = compose(
                         scaledSize: new google.maps.Size(50,50)
                     }}
                 />
-                {props.isChanged ? <div></div> : null}
                 {/*Generate parking slot markers*/}
                 {props.parkingSlots.length > 0 ? props.parkingSlots.map(slot => {
                         return (
@@ -85,7 +84,6 @@ const MyMapComponent = compose(
                     )
                     : null
                 }
-
                 <SearchBox
                     ref={props.onSearchBoxMounted}
                     bounds={props.bounds}
@@ -94,21 +92,10 @@ const MyMapComponent = compose(
                 >
                     <input
                         type="text"
-                        placeholder="Customized your placeholder"
-                        style={{
-                            boxSizing: `border-box`,
-                            border: `1px solid transparent`,
-                            width: `240px`,
-                            height: `32px`,
-                            marginTop: `87px`,
-                            padding: `0 12px`,
-                            borderRadius: `3px`,
-                            boxShadow: `0 2px 6px rgba(0, 0, 0, 0.3)`,
-                            fontSize: `14px`,
-                            outline: `none`,
-                            textOverflow: `ellipses`,
-                        }}
+                        placeholder="Where are you planning to go to? "
+                        className={classes.SearchBox}
                     />
+
                 </SearchBox>
                 {props.markers.map((marker, index) =>
                     <Marker key={index} position={marker.position} />
