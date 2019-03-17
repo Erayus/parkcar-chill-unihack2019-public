@@ -84,19 +84,23 @@ const MyMapComponent = compose(
                     )
                     : null
                 }
-                <SearchBox
-                    ref={props.onSearchBoxMounted}
-                    bounds={props.bounds}
-                    controlPosition={google.maps.ControlPosition.TOP_LEFT}
-                    onPlacesChanged={props.onPlacesChanged}
-                >
-                    <input
-                        type="text"
-                        placeholder="Where are you planning to go to? "
-                        className={classes.SearchBox}
-                    />
+                {!props.directions ? (
+                    <SearchBox
+                        ref={props.onSearchBoxMounted}
+                        bounds={props.bounds}
+                        controlPosition={google.maps.ControlPosition.TOP_LEFT}
+                        onPlacesChanged={props.onPlacesChanged}
+                    >
+                        <input
+                            type="text"
+                            placeholder="Where are you planning to go to? "
+                            className={classes.SearchBox}
+                        />
 
-                </SearchBox>
+                    </SearchBox>
+                ): null}
+
+
                 {props.markers.map((marker, index) =>
                     <Marker key={index} position={marker.position} />
                 )}

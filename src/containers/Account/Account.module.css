@@ -1,0 +1,14 @@
+.Account{
+    display: flex;
+    flex-wrap: nowrap;
+    padding: 20px
+}
+.Account img{
+    width: 150px;
+    height: 150px;
+    border-radius: 100%;
+}
+
+.Account div{
+    margin-left: 20px;
+}

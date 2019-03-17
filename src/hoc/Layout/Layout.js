@@ -2,7 +2,9 @@ import React, {Component} from "react";
 import Toolbar from "../../components/Navigation/Toolbar/Toolbar";
 import SideDrawer from "../../components/Navigation/SideDrawer/SideDrawer";
 import classes from './Layout.module.css';
-import Main from '../../containers/Map/Map';
+import Map from '../../containers/Map/Map';
+import Account from '../../containers/Account/Account'
+import { Switch, Route, Redirect } from "react-router-dom";
 
 
 class Layout extends Component  {
@@ -24,7 +26,11 @@ class Layout extends Component  {
                 <SideDrawer show={this.state.isDrawerOpen}
                             closeDrawer={this.closeSideDrawerHandler}/>
                 <main className={classes.Content}>
-                    <Main/>
+                    <Switch>
+                        <Route path="/map" exact component={Map}/>
+                        <Route path="/account" component={Account}/>
+                        <Redirect exact from="/" to="/map" />
+                    </Switch>
                 </main>
             </React.Fragment>
         )

@@ -6,13 +6,13 @@ const navigationItems = (props)=> {
     return (
         <ul className={classes.NavigationItems}>
             <NavigationItem link="/" active>Home</NavigationItem>
-            <NavigationItem link="/">
-                <span>Balance </span>
-                <span>$35</span>
+            <NavigationItem link="/account">
+                <span>Account </span>
+                <span>($35)</span>
             </NavigationItem>
-            <NavigationItem link="/">Account</NavigationItem>
+            <NavigationItem link="/">Disabled</NavigationItem>
             <NavigationItem link="/">Privacy</NavigationItem>
-            <NavigationItem link="/">Settings</NavigationItem>
+            <NavigationItem link="/">Setting</NavigationItem>
         </ul>
     )
 };

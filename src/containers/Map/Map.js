@@ -213,11 +213,14 @@ class MapContainer extends Component {
 
 
     render() {
+        console.log(this.state.singleSlotDetail);
         let slotDetail = null;
         if (this.state.singleSlotDetail){
             slotDetail = (
                 <div>
-                    <h1>{this.state.singleSlotDetail.st_marker_id}</h1>
+                    <h3>Slot Details </h3>
+                    <p><strong>Slot Id:</strong>{this.state.singleSlotDetail.st_marker_id} </p>
+                    <p><strong>Status: </strong>{this.state.singleSlotDetail.status}</p>
                     <button className="btn btn-success"
                             onClick={() => this.showDirection(this.state.singleSlotDetail)}>Start</button>
                 </div>
@@ -258,9 +261,20 @@ class MapContainer extends Component {
     }
 
     componentDidMount() {
+        let date = new Date();
+
+        let Day = `${date.getMonth() + 1}-${ date.getDate()}-${date.getFullYear()}`;
+        let time = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+
+        let formattedDate = Day + ' ' + time;
+        let payLoad = {
+            body: {
+                time: formattedDate
+            }
+        };
         axios.get('/')
             .then(res => {
-                let filterData = res.data.slice(0,10);
+                let filterData = res.data.slice(0,20);
                 // console.log(filterData);
                 this.setState({parkingSlots: [...filterData]})
             })
