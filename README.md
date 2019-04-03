@@ -1,68 +1,24 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## What it does
+Firstly, ParkCar Chill can help drivers check the real-time availability of the closest on-street parking spots and find the optimal way to be navigated to their destination once they set it through text or voice recognition button.
 
-## Available Scripts
+Secondly, Drivers don’t need to get our of their car to search for Pay station to pay for parking fees that all the payment will be deducted automatically online. All they need to do is just to top up their balance.
 
-In the project directory, you can run:
+Thirdly, we have fantastic parking expiry alert system to remind drivers in order to avoid unnecessary parking fines. In the other hand, it gonna help government decrease the human cost of hiring fines instructors as all the fine information can be accessed online provided by our technologies. Moreover, it will contribute to a smarter city as the traffic in the city can be possibly decreased once most of the drivers can find their parkings quickly.
 
-### `npm start`
+## How we built it
+We use React for Front End with Google Cloud Platform's APIs. Backend is with AWS services to form a serverless architecture.
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Challenges we ran into
+Technically, we can help drivers book their parking spots online. But in reality, it might not gonna work well as there are so many scenarios in the real traffic settings. For example, what if the drivers who booked the on-street parking spot on our app won’t show up? How would we gonna really help the drivers secure the parking just only by clicking on the button? Are we allowed to block the parking spots as they are the public properties of city of Melbourne? How are we gonna balance their interests well between different stakeholders?
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+## Accomplishments that we're proud of
+We have successfully managed to created the prototype and it’s functional. With our current web app, we can help the drivers nevigate the optimal way to the closest parking spot and count the parking time. Moreover, we have been through the user journey map as well for different testing and scenarios.
 
-### `npm test`
+## What we learned
+React and React Google Map, AWS Amazon API, AWS Lambda
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## What's next for ParkCar Chill
+Test it in the real world and improve it and compare it with our competitors.
 
-### `npm run build`
-
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+## Built With
+Reactjs, Python, AWS, Google APIs
